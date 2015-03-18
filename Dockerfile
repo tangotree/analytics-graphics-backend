@@ -12,4 +12,6 @@ ADD . /code
 WORKDIR /code
 RUN pip install -r ./requirements.txt
 
-CMD ["/code/run.sh"]
+EXPOSE 8888
+
+CMD ["/usr/bin/supervisord"]

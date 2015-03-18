@@ -26,31 +26,101 @@ class SocketHandler(websocket.WebSocketHandler):
 
 
 class ApiHandler(web.RequestHandler):
-    @web.asynchronous
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+
     def get(self, *args):
-        self.finish()
-        id = self.get_argument("id")
-        value = self.get_argument("value")
-        data = {"id": id, "value" : value}
-        data = json.dumps(data)
-        for c in cl:
-            c.write_message(data)
+        self.content_type = 'application/json'
+
+        arguments = self.request.arguments
+
+        if 'chartId' in arguments:
+            chartId = int(arguments['chartId'][0])
+        else:
+            chartId = 1
+
+        response_data = {
+            "title": "Active Users Today vs Yesterday",
+            "timezone": "Europe\/Madrid",
+            "timezone_offset": 3600,
+            "legend_enabled": True,
+            "series": [
+                {
+                    "metric": "Today",
+                    "name": "Today - mt - fb",
+                    "app": "Mailtrack",
+                    "platform": "Facebook Canvas",
+                    "appPlatformId": "5",
+                    "appPlatformTitle": "MT-Fb",
+                    "unit": "Users",
+                    "dimensions": [],
+                    "data": [{"x": 1425168000, "y": 1863367 * chartId},
+                             {"x": 1425171600, "y": 127567},
+                             {"x": 1425175200, "y": 236608},
+                             {"x": 1425178800, "y": 340709},
+                             {"x": 1425182400, "y": 433635},
+                             {"x": 1425186000, "y": 510654},
+                             {"x": 1425189600, "y": 573223},
+                             {"x": 1425193200, "y": 628870},
+                             {"x": 1425196800, "y": 684045},
+                             {"x": 1425200400, "y": 742740},
+                             {"x": 1425204000, "y": 804221},
+                             {"x": 1425207600, "y": 864805},
+                             {"x": 1425211200, "y": 925663},
+                             {"x": 1425214800, "y": 989460},
+                             {"x": 1425218400, "y": 1057963}
+                    ],
+                    "serieType": "datetime",
+                    "transformations": []
+                },
+                {
+                    "metric": "Yesterday",
+                    "name": "Yesterday - mt - fb [cmp]",
+                    "app": "Mailtrack",
+                    "unit": "Users",
+                    "dimensions": [],
+                    "data": [{"x": 1425168000, "y": 1863367 / chartId},
+                             {"x": 1425171600, "y": 1731251},
+                             {"x": 1425175200, "y": 137200},
+                             {"x": 1425178800, "y": 252038},
+                             {"x": 1425182400, "y": 357786},
+                             {"x": 1425186000, "y": 446678},
+                             {"x": 1425189600, "y": 521329},
+                             {"x": 1425193200, "y": 583867},
+                             {"x": 1425196800, "y": 643356},
+                             {"x": 1425200400, "y": 705148},
+                             {"x": 1425204000, "y": 770596},
+                             {"x": 1425207600, "y": 836767},
+                             {"x": 1425211200, "y": 901601},
+                             {"x": 1425214800, "y": 967255},
+                             {"x": 1425218400, "y": 1037015}
+                    ],
+                    "serieType": "datetime",
+                    "transformations": []
+                }
+            ],
+            "flags": [],
+            "transformations": []
+        }
+
+        response = json.dumps(response_data)
+        self.write(response)
 
     @web.asynchronous
     def post(self):
         pass
 
 
-class TestHandler(web.RequestHandler):
+class CustomBuilderHandler(web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
 
-    def check_origin(self, origin):
-        return True
-
     def get(self, *args, **kwargs):
         self.content_type = 'application/json'
-        response = [
+
+        arguments = self.request.arguments
+
+        response_data = [
             [1351728000000,596.54],
             [1351814400000,576.80],
             [1352073600000,584.62],
@@ -157,15 +227,22 @@ class TestHandler(web.RequestHandler):
             [1364342400000,452.08],
             [1364428800000,442.66]
         ]
-        r = json.dumps(response)
-        self.write(r)
+        response = json.dumps({
+            'series': [{
+                'name': 'test',
+                'data': response_data
+            }]
+        })
+        self.write(response)
 
 app = web.Application([
-    (r'/test', TestHandler),
-    (r'/ws', SocketHandler),
-    (r'/api', ApiHandler),
-    (r'/(.*)', web.StaticFileHandler, {'path': './web'}),
-])
+    (r'/api/builder$', CustomBuilderHandler),
+    (r'/api$', ApiHandler),
+    (r'/ws$', SocketHandler)
+    ],
+    debug=True
+)
+
 
 if __name__ == '__main__':
     app.listen(8888)
