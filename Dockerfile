@@ -12,4 +12,4 @@ ADD . /code
 WORKDIR /code
 RUN pip install -r ./requirements.txt
 
-CMD ["/usr/bin/supervisord"]
+CMD ["/code/run.sh"]
