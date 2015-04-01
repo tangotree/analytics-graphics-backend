@@ -11,7 +11,8 @@ ADD . /code
 
 WORKDIR /code
 RUN pip install -r ./requirements.txt
+RUN pip install autobahn==0.10.1 twisted
 
 EXPOSE 8888
 
-CMD ["/usr/bin/supervisord"]
+CMD ["/code/run.sh"]

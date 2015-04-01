@@ -1,28 +1,5 @@
-from tornado import websocket, web, ioloop
+from tornado import web, ioloop
 import json
-
-cl = []
-
-
-class SocketHandler(websocket.WebSocketHandler):
-    def __init__(self, application, request, **kwargs):
-        websocket.WebSocketHandler.__init__(self, application, request, **kwargs)
-
-    def check_origin(self, origin):
-        return True
-
-    def open(self):
-        if self not in cl:
-            cl.append(self)
-
-    def on_message(self, message):
-        print message
-        self.write_message(message)
-
-    def on_close(self):
-        print "close"
-        if self in cl:
-            cl.remove(self)
 
 
 class ApiHandler(web.RequestHandler):
@@ -238,12 +215,39 @@ class CustomBuilderHandler(web.RequestHandler):
 app = web.Application([
     (r'/api/builder$', CustomBuilderHandler),
     (r'/api$', ApiHandler),
-    (r'/ws$', SocketHandler)
     ],
     debug=True
 )
 
+import tornado.platform.twisted
+tornado.platform.twisted.install()
+from twisted.internet import reactor
+
+import random
+import time
+
+from twisted.internet.defer import inlineCallbacks
+from autobahn.twisted.util import sleep
+from autobahn.twisted.wamp import ApplicationSession
+
+class Component(ApplicationSession):
+    @inlineCallbacks
+    def onJoin(self, details):
+        print("session attached")
+        while True:
+            value = random.uniform(1, 600)
+            timestamp = int(time.time()*1000)
+            # timestamp = 1427839684018
+            self.publish('com.myapp.test', [timestamp, value])
+            yield sleep(1)
+
 
 if __name__ == '__main__':
+    debug = False
+
+    from autobahn.twisted.wamp import ApplicationRunner
+    runner = ApplicationRunner("ws://172.17.42.1:8080/ws", "realm1", debug_app=debug, debug_wamp=debug, debug=debug)
+    runner.run(Component, start_reactor=False)
+
     app.listen(8888)
     ioloop.IOLoop.instance().start()
