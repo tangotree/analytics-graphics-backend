@@ -1,6 +1,23 @@
+crossbar:
+  image: easen/crossbar.io
+  ports:
+    - "3000:8000"
+    - "8080:8080"
+  volumes:
+    - "crossbar_config.json:/.crossbar/config.json"
+
 app:
   build: .
   volumes:
    - .:/code
   ports:
    - "8888:8888"
+  environment:
+    ANALYTICS_DEBUG: true
+    ANALYTICS_ROUTER_IP: 172.17.42.1
+    ANALYTICS_ROUTER_PORT: 8080
+    ANALYTICS_APP_PORT: 8888
+    ANALYTICS_DATABASE_HOST: 172.17.42.1
+    ANALYTICS_DATABASE_USER: mailtrack
+    ANALYTICS_DATABASE_PASSWD: mailtrack
+    ANALYTICS_DATABASE_DB: mailtrack
