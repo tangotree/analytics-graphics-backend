@@ -1,0 +1,12 @@
+metrics:
+    my_metric:
+      granularity: [1hour, 1min, 1day]
+      query: "SELECT ..."
+      dimensions: [country]
+      summary_table: summary_table_email.open
+
+    other_metric:
+      granularity: [1hour, 1min, 1day]
+      query: "SELECT ..."
+      dimensions: [country]
+      summary_table: ~

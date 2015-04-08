@@ -1,0 +1,36 @@
+metrics:
+  email.open:
+    granularity: [1hour, 1min, 1day]
+    query: "SELECT ..."
+    dimensions: [country]
+    summary_table: summary_table_email.open.self
+
+  user.signup:
+    granularity: [1hour, 1min, 1day]
+    query: "SELECT ..."
+    dimensions: [country]
+    summary_table: summary_table_user.signup
+
+  user.info:
+    granularity: [1hour, 1min, 1day]
+    query: "SELECT ..."
+    dimensions: [country]
+    summary_table: summary_table_user.info
+
+  email.track.created:
+    granularity: [1hour, 1min, 1day]
+    query: "SELECT ..."
+    dimensions: [country]
+    summary_table: summary_table_email.track.created
+
+  crx.uninstall:
+    granularity: [1hour, 1min, 1day]
+    query: "SELECT ..."
+    dimensions: [country]
+    summary_table: summary_table_crx.uninstall
+
+  user.acquired:
+    granularity: [1hour, 1min, 1day]
+    query: "SELECT ..."
+    dimensions: [country]
+    summary_table: summary_table_user.acquired
