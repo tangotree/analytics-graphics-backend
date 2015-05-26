@@ -1,10 +1,12 @@
-
 {
    "controller": {
    },
    "workers": [
       {
          "type": "router",
+         "options": {
+            "pythonpath": ["/.crossbar"]
+         },
          "realms": [
             {
                "name": "realm1",
@@ -34,11 +36,33 @@
                "paths": {
                   "/": {
                      "type": "static",
-                     "directory": ".."
+                     "directory": "../"
                   },
                   "ws": {
                      "type": "websocket"
                   }
+               }
+            }
+         ]
+      },
+      {
+         "type": "container",
+         "options": {
+            "pythonpath": ["/.crossbar"]
+         },
+         "components": [
+            {
+               "type": "class",
+               "classname": "random_app.AppSession",
+               "realm": "realm1",
+               "transport": {
+                  "type": "websocket",
+                  "endpoint": {
+                     "type": "tcp",
+                     "host": "127.0.0.1",
+                     "port": 8080
+                  },
+                  "url": "ws://127.0.0.1:8080/ws"
                }
             }
          ]
