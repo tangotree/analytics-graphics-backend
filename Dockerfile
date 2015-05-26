@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 MAINTAINER vicent@tangotree.io
 
-RUN apt-get update && apt-get install -y supervisor python-dev curl
+RUN apt-get update && apt-get install -y supervisor python-dev curl python-mysqldb libmysqlclient-dev zlib1g-dev
 
 # Pip could not be installed using apt-get. It retrieved an old version that crashed trying to install nose and mock.
 # This new version runs smoothly
@@ -12,6 +12,7 @@ ADD . /code
 WORKDIR /code
 RUN pip install -r ./requirements.txt
 RUN pip install autobahn==0.10.1 twisted
+RUN pip install .
 
 EXPOSE 8888
 
